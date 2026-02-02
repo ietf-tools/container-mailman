@@ -15,10 +15,10 @@ mailman:
       existingSecretKey: destination
   restApi:
     user:
-      existingSecretName: mail-secrets-env
+      existingSecretName: mailman
       existingSecretKey: mailmanApiUser
     pass:
-      existingSecretName: mail-secrets-env
+      existingSecretName: mailman
       existingSecretKey: mailmanApiPass
 
   mta: postfix
@@ -72,6 +72,13 @@ mailarchiveSecret:
     apiKey: abcdE
     baseUrl: http://mailarchive/arch/
     destination: http://mailarchive/api/v1/message/import/
+
+mailmanSecret:
+  create: false
+  name: mailman
+  data:
+    mailmanApiUser: restadmin
+    mailmanApiPass: restpass
 
 # Default values for mailman.
 # This is a YAML-formatted file.
