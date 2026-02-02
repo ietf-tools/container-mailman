@@ -13,6 +13,13 @@ mailman:
     destination:
       existingSecretName: mailman-mailarchive
       existingSecretKey: destination
+  restApi:
+    user:
+      existingSecretName: mailman
+      existingSecretKey: mailmanApiUser
+    pass:
+      existingSecretName: mailman
+      existingSecretKey: mailmanApiPass
 
   mta: postfix
   smtpHost: postfix
