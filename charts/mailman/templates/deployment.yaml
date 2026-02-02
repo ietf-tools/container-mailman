@@ -100,6 +100,16 @@ spec:
                 secretKeyRef:
                   name: {{ tpl .Values.mailman.mailarchiver.destination.existingSecretName . }}
                   key: {{ tpl .Values.mailman.mailarchiver.destination.existingSecretKey . }}
+            - name: MAILMAN_REST_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ tpl .Values.mailman.restApi.user.existingSecretName . }}
+                  key: {{ tpl .Values.mailman.restApi.user.existingSecretKey . }}
+            - name: MAILMAN_REST_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ tpl .Values.mailman.restApi.pass.existingSecretName . }}
+                  key: {{ tpl .Values.mailman.restApi.pass.existingSecretKey . }}
           ports:
             - name: api
               containerPort: {{ .Values.service.apiPort }}
