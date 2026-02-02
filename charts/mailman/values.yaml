@@ -15,10 +15,10 @@ mailman:
       existingSecretKey: destination
   restApi:
     user:
-      existingSecretName: mailman
+      existingSecretName: mail-secrets-env
       existingSecretKey: mailmanApiUser
     pass:
-      existingSecretName: mailman
+      existingSecretName: mail-secrets-env
       existingSecretKey: mailmanApiPass
 
   mta: postfix
