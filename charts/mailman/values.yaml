@@ -48,6 +48,7 @@ mailman:
       count: 1
     digest:
       count: 1
+  globalAllowlistFqdn: ""
   arc:
     enabled: false
     domain: mydomain.com

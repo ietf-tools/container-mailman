@@ -100,6 +100,10 @@ spec:
                 secretKeyRef:
                   name: {{ tpl .Values.mailman.mailarchiver.destination.existingSecretName . }}
                   key: {{ tpl .Values.mailman.mailarchiver.destination.existingSecretKey . }}
+            {{- if .Values.mailman.globalAllowlistFqdn }}
+            - name: GLOBAL_ALLOWLIST_FQDN
+              value: "{{ .Values.mailman.globalAllowlistFqdn }}"
+            {{- end }}
             - name: MAILMAN_REST_USER
               valueFrom:
                 secretKeyRef:

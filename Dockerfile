@@ -4,6 +4,7 @@ USER root
 
 ENV MAILMAN_VERSION 3.3.10
 ENV MAILARCHIVE_VERSION git+https://github.com/sargeant/mailman-mailarchive.git@v1.1.1
+ENV IETF_STYLES_VERSION git+https://github.com/ietf-tools/mailman-ietf-styles.git@main
 
 RUN apk update \
     && apk add --virtual build-deps gcc python3-dev musl-dev linux-headers \
@@ -13,6 +14,7 @@ RUN apk update \
         && python3 -m pip install --break-system-packages \
                    mailman==${MAILMAN_VERSION} \
                    ${MAILARCHIVE_VERSION} \
+                   ${IETF_STYLES_VERSION} \
                    'importlib-resources<6.0.0' \
     && apk del build-deps \
     && adduser -S mailman

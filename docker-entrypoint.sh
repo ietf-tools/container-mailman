@@ -317,6 +317,27 @@ echo "MAILARCHIVE_API_KEY not defined, skipping IETF Mail Archive setup..."
 
 fi
 
+if [[ -v GLOBAL_ALLOWLIST_FQDN ]]; then
+
+echo "GLOBAL_ALLOWLIST_FQDN found, setting up IETF styles plugin..."
+
+cat >> /etc/mailman.cfg << EOF
+[plugin.ietf_styles]
+class: mailman_ietf_styles.plugin.IETFStylesPlugin
+enabled: yes
+component_package: mailman_ietf_styles
+
+[styles]
+default: ietf-default
+
+EOF
+
+else
+
+echo "GLOBAL_ALLOWLIST_FQDN not defined, skipping IETF styles plugin..."
+
+fi
+
 # setup runner numbers
 
 cat >> /etc/mailman.cfg << EOF
