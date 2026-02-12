@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   mailman:
   - apiVersion: v2
+    appVersion: 1.0.6
+    created: "2026-02-12T05:48:27.889356146Z"
+    description: IETF mailman deployment for kubernetes
+    digest: ed599151e816135397f8642e868f7054ff9802655c30020b4ea0e0a31a7d537a
+    name: mailman
+    type: application
+    urls:
+    - https://github.com/ietf-tools/container-mailman/releases/download/mailman-1.0.6/mailman-1.0.6.tgz
+    version: 1.0.6
+  - apiVersion: v2
     appVersion: 1.0.5
     created: "2026-02-12T04:16:12.942272864Z"
     description: IETF mailman deployment for kubernetes
@@ -61,4 +71,4 @@ entries:
     urls:
     - https://github.com/ietf-tools/container-mailman/releases/download/mailman-1.0.0/mailman-1.0.0.tgz
     version: 1.0.0
-generated: "2026-02-12T04:16:12.942294154Z"
+generated: "2026-02-12T05:48:27.889380872Z"
