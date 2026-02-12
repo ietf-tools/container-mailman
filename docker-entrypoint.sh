@@ -321,12 +321,17 @@ if [[ -v GLOBAL_ALLOWLIST_FQDN ]]; then
 
 echo "GLOBAL_ALLOWLIST_FQDN found, setting up IETF styles plugin..."
 
+cat > /etc/mailman-ietf-styles.cfg <<EOF
+[general]
+global_allowlist_fqdn: $GLOBAL_ALLOWLIST_FQDN
+EOF
+
 cat >> /etc/mailman.cfg << EOF
 [plugin.ietf_styles]
 class: mailman_ietf_styles.plugin.IETFStylesPlugin
 enabled: yes
 component_package: mailman_ietf_styles
-global_allowlist_fqdn: $GLOBAL_ALLOWLIST_FQDN
+configuration: /etc/mailman-ietf-styles.cfg
 
 [styles]
 default: ietf-default
