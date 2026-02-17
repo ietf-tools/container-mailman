@@ -3,7 +3,7 @@ FROM alpine:3.21
 USER root
 
 ENV MAILMAN_VERSION 3.3.10
-ENV MAILARCHIVE_VERSION git+https://github.com/sargeant/mailman-mailarchive.git@v1.1.1
+ENV MAILARCHIVE_VERSION git+https://github.com/ietf-tools/mailman-mailarchive.git@main
 ENV IETF_STYLES_VERSION git+https://github.com/ietf-tools/mailman-ietf-styles.git@main
 
 RUN apk update \
