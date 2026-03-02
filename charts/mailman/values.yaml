@@ -24,6 +24,17 @@ mailman:
   mta: postfix
   smtpHost: postfix
   smtpPort: 25
+  smtpSecureMode: smtp
+  smtpVerifyHostname: no
+  smtpVerifyCertificate: no
+  smtpAuth:
+    enabled: false
+    user:
+      existingSecretName: mailman
+      existingSecretKey: mailmanSmtpUser
+    pass:
+      existingSecretName: mailman
+      existingSecretKey: mailmanSmtpPass
   runners:
     archive:
       count: 1
@@ -80,6 +91,8 @@ mailmanSecret:
   data:
     mailmanApiUser: restadmin
     mailmanApiPass: restpass
+    mailmanSmtpUser: smtpuser
+    mailmanSmtpPass: smtpuser
 
 # Default values for mailman.
 # This is a YAML-formatted file.
