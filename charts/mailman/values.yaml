@@ -195,3 +195,15 @@ persistence:
   # -- Only mount a subpath of the Volume into the pod
   subPath: ""
 
+filebeat:
+  enabled: false
+  tlsCA: false
+  filebeatVersion: 9.3.3
+  loggingHostname: my-mailman
+  logstashHost: 127.0.0.1
+  logstashPort: 5044
+  logstashTags:
+    - mailman
+    - k8s
+  filePaths:
+    - /var/logs/*.log

@@ -423,6 +423,82 @@ selector: ${ARC_SELECTOR}
 
 EOF
 
+cat >>/etc/mailman.cfg <<EOF
+[logging.template]
+format: %(asctime)s mailman/%(processName)s[%(process)d] %(message)s [%(filename)s:%(lineno)d]
+
+datefmt: %b %d %H:%M:%S
+propagate: no
+level: info
+path: mailman.log
+
+[logging.root]
+format: %(asctime)s mailman/%(processName)s[%(process)d] %(message)s [%(filename)s:%(lineno)d]
+
+[logging.archiver]
+
+[logging.bounce]
+path: bounce.log
+format: %(asctime)s mailman/bounce[%(process)d] %(message)s [%(filename)s:%(lineno)d]
+datefmt: %b %d %H:%M:%S
+
+[logging.config]
+
+[logging.database]
+level: warn
+format: %(asctime)s mailman/db[%(process)d] %(message)s [%(filename)s:%(lineno)d]
+datefmt: %b %d %H:%M:%S
+
+[logging.debug]
+path: debug.log
+level: info
+
+[logging.error]
+
+[logging.fromusenet]
+
+[logging.http]
+format: %(asctime)s mailman/http[%(process)d] %(message)s [%(filename)s:%(lineno)d]
+datefmt: %b %d %H:%M:%S
+
+[logging.gunicorn]
+format: %(asctime)s mailman/gunicorn[%(process)d] %(message)s [%(filename)s:%(lineno)d]
+datefmt: %b %d %H:%M:%S
+
+[logging.locks]
+
+[logging.mischief]
+
+[logging.plugins]
+path: plugins.log
+format: %(asctime)s mailman/plugins[%(process)d] %(message)s [%(filename)s:%(lineno)d]
+datefmt: %b %d %H:%M:%S
+
+[logging.runner]
+format: %(asctime)s mailman/runner[%(process)d] %(message)s [%(filename)s:%(lineno)d]
+
+[logging.smtp]
+path: smtp.log
+datefmt: %b %d %H:%M:%S
+format: %(asctime)s mailman/smtp[%(process)d] %(message)s [%(filename)s:%(lineno)d]
+every: $msgid smtp to $listname for $recip recips, completed in $time seconds
+success: $msgid post to $listname from $sender, $size bytes
+refused: $msgid post to $listname from $sender, $size bytes, $refused failures
+failure: $msgid delivery to $recip failed with code $smtpcode, $smtpmsg
+
+[logging.subscribe]
+format: %(asctime)s mailman/subscribe[%(process)d] %(message)s [%(filename)s:%(lineno)d]
+datefmt: %b %d %H:%M:%S
+
+[logging.task]
+format: %(asctime)s mailman/task[%(process)d] %(message)s [%(filename)s:%(lineno)d]
+datefmt: %b %d %H:%M:%S
+
+[logging.vette]
+format: %(asctime)s mailman/vette[%(process)d] %(message)s [%(filename)s:%(lineno)d]
+datefmt: %b %d %H:%M:%S
+EOF
+
 # Now chown the places where mailman wants to write stuff.
 VAR_DIR="/opt/mailman/var"
 # Check if the directory exists
