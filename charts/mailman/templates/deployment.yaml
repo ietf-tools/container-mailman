@@ -146,6 +146,30 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /opt/mailman/var
+      {{- if .Values.filebeat.enabled }}
+      initContainers:
+      - name: filebeat
+        image: elastic/filebeat:{{ .Values.filebeat.filebeatVersion }}
+        imagePullPolicy: IfNotPresent
+        restartPolicy: Always
+        args:
+          - -c
+          - /etc/filebeat.yml
+          - -e
+        volumeMounts:
+          - name: data
+            mountPath: /var
+          - name: filebeat-config
+            mountPath: /etc/filebeat.yml
+            subPath: filebeat.yml
+            readOnly: true
+          {{- if .Values.filebeat.tlsCA }}
+          - name: filebeat-ca
+            mountPath: /etc/filebeat/ca.pem
+            subPath: ca.pem
+            readOnly: true
+          {{- end }}
+      {{- end }}
       volumes:
         - name: data
         {{- if .Values.persistence.enabled }}
@@ -153,6 +177,18 @@ spec:
             claimName: {{ default (include "mailman.fullname" .) .Values.persistence.existingClaim }}
         {{- else }}
           emptyDir: {}
+        {{- end }}
+        {{- if .Values.filebeat.enabled }}
+        - name: filebeat-config
+          configMap:
+            name: {{ include "mailman.fullname" . }}-filebeat-config
+            defaultMode: 0444
+        {{- if .Values.filebeat.tlsCA }}
+        - name: filebeat-ca
+          configMap:
+            name: {{ include "mailman.fullname" . }}-filebeat-ca
+            defaultMode: 0444
+        {{- end }}
         {{- end }}
 
       {{- with .Values.nodeSelector }}
