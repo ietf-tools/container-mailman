@@ -165,6 +165,9 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
+strategy:
+  type: Recreate
+
 # Additional volumes on the output Deployment definition.
 volumes: []
   # - name: foo
@@ -211,3 +214,4 @@ filebeat:
     - k8s
   filePaths:
     - /var/logs/*.log
+
