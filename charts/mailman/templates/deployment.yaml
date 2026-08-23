@@ -150,8 +150,115 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /opt/mailman/var
-      {{- if .Values.filebeat.enabled }}
       initContainers:
+      {{- if .Values.mailman.cron.enabled }}
+      - name: mailman-cron
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        restartPolicy: Always
+        args: ["crond", "-f", "-d", "6"]
+        env:
+          - name: MM_HOSTNAME
+            value: {{ .Values.mailman.hostname }}
+          - name: MM_RUNNER_ARCHIVE_COUNT
+            value: "{{ .Values.mailman.runners.archive.count }}"
+          - name: MM_RUNNER_BOUNCES_COUNT
+            value: "{{ .Values.mailman.runners.bounces.count }}"
+          - name: MM_RUNNER_IN_COUNT
+            value: "{{ .Values.mailman.runners.in.count }}"
+          - name: MM_RUNNER_LMTP_COUNT
+            value: "{{ .Values.mailman.runners.lmtp.count }}"
+          - name: MM_RUNNER_OUT_COUNT
+            value: "{{ .Values.mailman.runners.out.count }}"
+          - name: MM_RUNNER_PIPELINE_COUNT
+            value: "{{ .Values.mailman.runners.pipeline.count }}"
+          - name: MM_RUNNER_REST_COUNT
+            value: "{{ .Values.mailman.runners.rest.count }}"
+          - name: MM_RUNNER_RETRY_COUNT
+            value: "{{ .Values.mailman.runners.retry.count }}"
+          - name: MM_RUNNER_TASK_COUNT
+            value: "{{ .Values.mailman.runners.task.count }}"
+          - name: MM_RUNNER_VIRGIN_COUNT
+            value: "{{ .Values.mailman.runners.virgin.count }}"
+          - name: MM_RUNNER_DIGEST_COUNT
+            value: "{{ .Values.mailman.runners.digest.count }}"
+          - name: DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: {{ tpl .Values.mailman.dbUrl.existingSecretName . }}
+                key: {{ tpl .Values.mailman.dbUrl.existingSecretKey . }}
+          - name: MTA
+            value: {{ .Values.mailman.mta }}
+          - name: SMTP_HOST
+            value: {{ .Values.mailman.smtpHost }}
+          - name: SMTP_PORT
+            value: "{{ .Values.mailman.smtpPort }}"
+          - name: ARC_ENABLED
+            value: "{{ .Values.mailman.arc.enabled }}"
+          - name: ARC_DOMAIN
+            value: "{{ .Values.mailman.arc.domain }}"
+          - name: ARC_KEY_PATH
+            value: "{{ .Values.mailman.arc.keyPath }}"
+          - name: ARC_SELECTOR
+            value: "{{ .Values.mailman.arc.selector }}"
+          - name: ARC_AUTHSERVER_ID
+            value: "{{ .Values.mailman.arc.authserver_id }}"
+          - name: MAILARCHIVE_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ tpl .Values.mailman.mailarchiver.apiKey.existingSecretName . }}
+                key: {{ tpl .Values.mailman.mailarchiver.apiKey.existingSecretKey . }}
+          - name: MAILARCHIVE_BASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: {{ tpl .Values.mailman.mailarchiver.baseUrl.existingSecretName . }}
+                key: {{ tpl .Values.mailman.mailarchiver.baseUrl.existingSecretKey . }}
+          - name: MAILARCHIVE_DESTINATION
+            valueFrom:
+              secretKeyRef:
+                name: {{ tpl .Values.mailman.mailarchiver.destination.existingSecretName . }}
+                key: {{ tpl .Values.mailman.mailarchiver.destination.existingSecretKey . }}
+          {{- if .Values.mailman.globalAllowlistFqdn }}
+          - name: GLOBAL_ALLOWLIST_FQDN
+            value: "{{ .Values.mailman.globalAllowlistFqdn }}"
+          {{- end }}
+          - name: MAILMAN_REST_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ tpl .Values.mailman.restApi.user.existingSecretName . }}
+                key: {{ tpl .Values.mailman.restApi.user.existingSecretKey . }}
+          - name: MAILMAN_REST_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ tpl .Values.mailman.restApi.pass.existingSecretName . }}
+                key: {{ tpl .Values.mailman.restApi.pass.existingSecretKey . }}
+          {{- if .Values.mailman.smtpAuth.enabled }}
+          - name: SMTP_HOST_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ tpl .Values.mailman.smtpAuth.user.existingSecretName . }}
+                key: {{ tpl .Values.mailman.smtpAuth.user.existingSecretKey . }}
+          - name: SMTP_HOST_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ tpl .Values.mailman.smtpAuth.pass.existingSecretName . }}
+                key: {{ tpl .Values.mailman.smtpAuth.pass.existingSecretKey . }}
+          {{- end }}
+          - name: SMTP_SECURE_MODE
+            value: "{{ .Values.mailman.smtpSecureMode }}"
+          - name: SMTP_VERIFY_CERT
+            value: "{{ .Values.mailman.smtpVerifyCertificate }}"
+          - name: SMTP_VERIFY_HOSTNAME
+            value: "{{ .Values.mailman.smtpVerifyHostname }}"
+        volumeMounts:
+          - name: data
+            mountPath: /opt/mailman/var
+          - name: mailman-cron
+            mountPath: /etc/cron.d/mailman
+            subPath: mailman
+            readOnly: true
+      {{- end }}
+      {{- if .Values.filebeat.enabled }}
       - name: filebeat
         image: elastic/filebeat:{{ .Values.filebeat.filebeatVersion }}
         imagePullPolicy: IfNotPresent
@@ -193,6 +300,12 @@ spec:
             name: {{ include "mailman.fullname" . }}-filebeat-ca
             defaultMode: 0444
         {{- end }}
+        {{- end }}
+        {{- if .Values.mailman.cron.enabled }}
+        - name: mailman-cron
+          configMap:
+            name: {{ include "mailman.fullname" . }}-cron
+            defaultMode: 0444
         {{- end }}
 
       {{- with .Values.dnsPolicy }}

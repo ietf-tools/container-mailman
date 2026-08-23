@@ -17,7 +17,8 @@ RUN apk update \
                    ${IETF_STYLES_VERSION} \
                    'importlib-resources<6.0.0' \
     && apk del build-deps \
-    && adduser -S mailman
+    && adduser -S mailman \
+    && rm /etc/crontabs/root
 
 COPY docker-entrypoint.sh /usr/local/bin/
 
