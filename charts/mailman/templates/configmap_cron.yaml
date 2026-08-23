@@ -1,0 +1,10 @@
+{{- if .Values.mailman.cron.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "mailman.fullname" . }}-cron
+data:
+  mailman: |
+    {{ .Values.mailman.cron.admin_notify }} mailman /usr/bin/mailman notify
+    {{ .Values.mailman.cron.digest_periodic }} mailman /usr/bin/mailman digests --periodic
+{{- end }}

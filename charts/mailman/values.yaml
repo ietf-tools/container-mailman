@@ -1,5 +1,10 @@
 mailman:
   hostname: mailman
+  cron:
+    enabled: true
+    # These are based off UTC,
+    admin_notify: "0 9 * * *"
+    digest_periodic: "0 10 * * *"
   dbUrl:
     existingSecretName: db-app
     existingSecretKey: uri
