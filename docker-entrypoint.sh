@@ -462,7 +462,7 @@ format: %(asctime)s mailman/http[%(process)d] %(message)s [%(filename)s:%(lineno
 datefmt: %b %d %H:%M:%S
 
 [logging.gunicorn]
-format: %(asctime)s mailman/gunicorn[%(process)d] %(message)s [%(filename)s:%(lineno)d]
+format: %(asctime)s mailman/gunicorn[%(process)s] %(message)s [%(filename)s:%(lineno)s]
 datefmt: %b %d %H:%M:%S
 
 [logging.locks]
