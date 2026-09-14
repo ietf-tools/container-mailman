@@ -45,7 +45,8 @@ class MailmanExporter:
     def args(self):
         parser = argparse.ArgumentParser(description='Mailman3 Prometheus metrics exporter')
         parser.add_argument('--log-level', default='INFO', choices=['debug', 'info', 'warning', 'error', 'critical'], help='Detail level to log. (default: info)')
-        parser.add_argument('-l', '--web.listen', dest='web_listen', type=str, default="localhost:9934", help='HTTPServer metrics listen address')
+        parser.add_argument('-l', '--web.listen', dest='web_listen', type=str,
+                            default="0.0.0.0:9934", help='HTTPServer metrics listen address')
 
         parser.add_argument('-m', '--mailman.address', dest='mailman_address', type=str, default="http://mailman:8001", help='Mailman3 Core REST API address')
         parser.add_argument('-u', '--mailman.user', dest='mailman_user', type=str, required=False, help='Mailman3 Core REST API username')
