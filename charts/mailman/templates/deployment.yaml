@@ -258,6 +258,30 @@ spec:
             subPath: mailman
             readOnly: true
       {{- end }}
+      {{- if .Values.mailman.exporter.enabled }}
+      - name: mailman-exporter
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        restartPolicy: Always
+        args: ["/usr/local/bin/exporter.py"]
+        ports:
+          - name: metrics
+            containerPort: 9934
+            protocol: TCP
+        env:
+          - name: MM_HOSTNAME
+            value: {{ .Values.mailman.hostname }}
+          - name: MAILMAN_REST_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ tpl .Values.mailman.restApi.user.existingSecretName . }}
+                key: {{ tpl .Values.mailman.restApi.user.existingSecretKey . }}
+          - name: MAILMAN_REST_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ tpl .Values.mailman.restApi.pass.existingSecretName . }}
+                key: {{ tpl .Values.mailman.restApi.pass.existingSecretKey . }}
+      {{- end }}
       {{- if .Values.filebeat.enabled }}
       - name: filebeat
         image: elastic/filebeat:{{ .Values.filebeat.filebeatVersion }}

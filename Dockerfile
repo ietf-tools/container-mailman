@@ -12,6 +12,7 @@ RUN apk update \
     sqlite git postgresql17-client py3-psycopg2 postfix \
     && python3 -m pip install --break-system-packages -U pip setuptools wheel \
         && python3 -m pip install --break-system-packages \
+                   prometheus_client==0.26.0 \
                    mailman==${MAILMAN_VERSION} \
                    ${MAILARCHIVE_VERSION} \
                    ${IETF_STYLES_VERSION} \
@@ -21,6 +22,8 @@ RUN apk update \
     && rm /etc/crontabs/root
 
 COPY docker-entrypoint.sh /usr/local/bin/
+
+COPY exporter.py /usr/local/bin/
 
 WORKDIR /opt/mailman
 
