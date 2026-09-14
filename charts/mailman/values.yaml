@@ -1,5 +1,7 @@
 mailman:
   hostname: mailman
+  exporter:
+    enabled: true
   cron:
     enabled: true
     # These are based off UTC,
