@@ -383,12 +383,6 @@ instances: ${MM_RUNNER_PIPELINE_COUNT:-1}
 EOF
 
 cat >> /etc/mailman.cfg << EOF
-[runner.rest]
-instances: ${MM_RUNNER_REST_COUNT:-2}
-
-EOF
-
-cat >> /etc/mailman.cfg << EOF
 [runner.retry]
 instances: ${MM_RUNNER_RETRY_COUNT:-1}
 sleep_time: 10s
