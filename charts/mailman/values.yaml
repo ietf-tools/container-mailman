@@ -1,4 +1,5 @@
 mailman:
+  site_owner: me@myhost.com
   hostname: mailman
   exporter:
     enabled: true
