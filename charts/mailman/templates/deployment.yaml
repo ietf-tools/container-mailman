@@ -157,7 +157,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           restartPolicy: Always
-          args: ["/usr/local/bin/exporter.py"]
+          command: ["/usr/local/bin/exporter.py"]
           ports:
             - name: metrics
               containerPort: 9934
@@ -175,6 +175,15 @@ spec:
                 secretKeyRef:
                   name: {{ tpl .Values.mailman.restApi.pass.existingSecretName . }}
                   key: {{ tpl .Values.mailman.restApi.pass.existingSecretKey . }}
+            {{- range $name, $runner := .Values.mailman.runners }}
+            - name: MM_RUNNER_{{ upper $name }}_COUNT
+              value: "{{ $runner.count }}"
+            {{- end }}
+          volumeMounts:
+            # Read-only view of the queue directories for in-flight metrics.
+            - name: data
+              mountPath: /opt/mailman/var
+              readOnly: true
         {{- end }}
       initContainers:
       {{- if .Values.mailman.cron.enabled }}

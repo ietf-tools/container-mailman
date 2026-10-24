@@ -19,6 +19,13 @@ from prometheus_client.core import REGISTRY, CounterMetricFamily, GaugeMetricFam
 exporter = None
 MM_API_VERS="3.1"
 
+# Switchboard file states, by extension (see mailman.core.switchboard).
+QUEUE_FILE_STATES = {
+    '.pck': 'waiting',      # enqueued, not yet picked up
+    '.bak': 'in_flight',    # dequeued by a runner and being processed
+    '.psv': 'preserved',    # failed processing, kept in the bad queue
+}
+
 PROCESSING_TIME = None
 class metric_processing_time:
     def __init__(self, name):
@@ -38,6 +45,7 @@ class MailmanExporter:
     def __init__(self):
         self.web_listen = ""
         self.mailman_address = ""
+        self.queue_dir = ""
 
         self.mailman_user = os.environ.get("MAILMAN_REST_USER", "")
         self.mailman_password = os.environ.get("MAILMAN_REST_PASSWORD", "")
@@ -49,6 +57,9 @@ class MailmanExporter:
                             default="0.0.0.0:9934", help='HTTPServer metrics listen address')
 
         parser.add_argument('-m', '--mailman.address', dest='mailman_address', type=str, default="http://mailman:8001", help='Mailman3 Core REST API address')
+        parser.add_argument('--mailman.var-dir', dest='mailman_var_dir', type=str,
+                            default=os.environ.get('MAILMAN_VAR_DIR', '/opt/mailman/var'),
+                            help='Mailman3 var directory, mounted read-only, for queue file metrics')
         parser.add_argument('-u', '--mailman.user', dest='mailman_user', type=str, required=False, help='Mailman3 Core REST API username')
 
         group = parser.add_mutually_exclusive_group(required=False)
@@ -66,6 +77,7 @@ class MailmanExporter:
 
         self.web_listen = args.web_listen
         self.mailman_address = args.mailman_address
+        self.queue_dir = os.path.join(args.mailman_var_dir, 'queue')
         if not self.mailman_user:
             self.mailman_user = args.mailman_user
         if not self.mailman_password:
@@ -163,6 +175,60 @@ class MailmanExporter:
         return response.status_code, queues
 
 
+def scan_queues(queue_dir, now):
+    """Count switchboard files in each queue directory by state.
+
+    Returns {queue: {state: (count, oldest_age_seconds)}}, or None if
+    queue_dir can't be read.  In-flight age is measured from the file's
+    ctime, which the runner's rename to .bak updates; the others use the
+    enqueue timestamp in the file name.
+    """
+    try:
+        queues = sorted(e.name for e in os.scandir(queue_dir) if e.is_dir())
+    except OSError as e:
+        logging.warning("queue scan: cannot read %s: %s", queue_dir, e)
+        return None
+
+    result = {}
+    for queue in queues:
+        states = {state: [0, 0.0] for state in QUEUE_FILE_STATES.values()}
+        try:
+            entries = list(os.scandir(os.path.join(queue_dir, queue)))
+        except OSError:
+            continue
+        for entry in entries:
+            filebase, ext = os.path.splitext(entry.name)
+            state = QUEUE_FILE_STATES.get(ext)
+            if state is None:
+                continue
+            if state == 'in_flight':
+                try:
+                    since = entry.stat().st_ctime
+                except FileNotFoundError:
+                    # Runner finished with it while we were looking.
+                    continue
+            else:
+                try:
+                    since = float(filebase.split('+', 1)[0])
+                except ValueError:
+                    continue
+            states[state][0] += 1
+            states[state][1] = max(states[state][1], now - since)
+        result[queue] = {state: tuple(v) for state, v in states.items()}
+    return result
+
+
+def runner_instances():
+    """Configured runner counts, from the MM_RUNNER_<NAME>_COUNT env vars
+    that docker-entrypoint.sh writes into mailman.cfg."""
+    counts = {}
+    for key, value in os.environ.items():
+        m = re.fullmatch(r'MM_RUNNER_(\w+)_COUNT', key)
+        if m and value.isdigit():
+            counts[m.group(1).lower()] = int(value)
+    return counts
+
+
 class MailmanCollector(object):
 
     def __init__(self, exporter):
@@ -255,6 +321,31 @@ class MailmanCollector(object):
             else:
                 mailman3_queue_status.add_metric(['status'], value=status)
             yield mailman3_queue
+
+        with metric_processing_time('queue_files'):
+            files = GaugeMetricFamily('mailman3_queue_files',
+                'Queue files by state: waiting (.pck), in_flight (.bak), preserved (.psv)',
+                labels=['queue', 'state'])
+            oldest = GaugeMetricFamily('mailman3_queue_oldest_age_seconds',
+                'Age of the oldest queue file in each state; 0 when there are none',
+                labels=['queue', 'state'])
+            scan_up = GaugeMetricFamily('mailman3_queue_scan_up',
+                '1 if the queue directories could be read, 0 otherwise')
+            scan = scan_queues(self.exporter.queue_dir, time.time())
+            scan_up.add_metric([], 0 if scan is None else 1)
+            for queue, states in (scan or {}).items():
+                for state, (count, age) in states.items():
+                    files.add_metric([queue, state], count)
+                    oldest.add_metric([queue, state], age)
+            yield scan_up
+            yield files
+            yield oldest
+
+            instances = GaugeMetricFamily('mailman3_runner_instances',
+                'Configured number of runner processes', labels=['runner'])
+            for runner, count in sorted(runner_instances().items()):
+                instances.add_metric([runner], count)
+            yield instances
 
         yield PROCESSING_TIME
 
