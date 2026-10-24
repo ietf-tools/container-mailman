@@ -12,6 +12,8 @@ RUN apk update \
     sqlite git postgresql17-client py3-psycopg2 postfix \
     && python3 -m pip install --break-system-packages -U pip setuptools wheel \
         && python3 -m pip install --break-system-packages \
+                   SQLAlchemy==2.0.54 \
+                   psycopg \
                    prometheus_client==0.26.0 \
                    mailman==${MAILMAN_VERSION} \
                    ${MAILARCHIVE_VERSION} \
