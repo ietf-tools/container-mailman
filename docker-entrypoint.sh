@@ -425,7 +425,7 @@ selector: ${ARC_SELECTOR}
 
 EOF
 
-cat >>/etc/mailman.cfg <<EOF
+cat >>/etc/mailman.cfg <<'EOF'
 [logging.template]
 format: %(asctime)s mailman/%(processName)s[%(process)d] %(message)s [%(filename)s:%(lineno)d]
 
