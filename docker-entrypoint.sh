@@ -513,5 +513,26 @@ chown -R mailman $VAR_DIR
 # Generate the LMTP files for postfix if needed.
 su-exec mailman mailman aliases
 
+# Copy the log files to stdout.  master waits for all of its children before
+# exiting, so tail can't be its child: keep bash as PID 1 to supervise both.
+if [ "$1" = "master" ]; then
+	su-exec mailman tail -q -n 0 -F "$VAR_DIR"/logs/*.log &
+	tail_pid=$!
+	su-exec mailman "$@" &
+	master_pid=$!
+	for sig in TERM INT HUP USR1; do
+		trap "kill -$sig \"\$master_pid\" 2>/dev/null || true" "$sig"
+	done
+	# wait returns early when a trapped signal arrives, so loop until master
+	# exits, then wait once more to get its real exit status.
+	while kill -0 "$master_pid" 2>/dev/null; do
+		wait "$master_pid" || true
+	done
+	status=0
+	wait "$master_pid" || status=$?
+	kill "$tail_pid" 2>/dev/null || true
+	exit "$status"
+fi
+
 exec su-exec mailman "$@"
 
