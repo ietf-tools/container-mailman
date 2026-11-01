@@ -1,8 +1,8 @@
-FROM alpine:3.21
+FROM alpine:3.24
 
 USER root
 
-ENV MAILMAN_VERSION 3.3.10
+ENV MAILMAN_VERSION git+https://gitlab.com/mailman/mailman.git@7a36c91bdcf88edb2e0c84ae0d579daf856e8f20
 ENV MAILARCHIVE_VERSION git+https://github.com/ietf-tools/mailman-mailarchive.git@main
 ENV IETF_STYLES_VERSION git+https://github.com/ietf-tools/mailman-ietf-styles.git@main
 
@@ -15,7 +15,7 @@ RUN apk update \
                    SQLAlchemy==2.0.54 \
                    psycopg \
                    prometheus_client==0.26.0 \
-                   mailman==${MAILMAN_VERSION} \
+                   ${MAILMAN_VERSION} \
                    ${MAILARCHIVE_VERSION} \
                    ${IETF_STYLES_VERSION} \
                    'importlib-resources<6.0.0' \
