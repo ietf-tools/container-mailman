@@ -142,6 +142,10 @@ podAnnotations: {}
 # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 podLabels: {}
 
+# Mailman runners finish the message in hand before stopping, so a large delivery can take a while.
+# A runner killed before it finishes may send that message again when the pod restarts.
+terminationGracePeriodSeconds: 120
+
 podSecurityContext: {}
   # fsGroup: 2000
 
