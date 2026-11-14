@@ -164,6 +164,7 @@ smtp_secure_mode: $SMTP_SECURE_MODE
 smtp_verify_hostname: $SMTP_VERIFY_HOSTNAME
 smtp_verify_cert: $SMTP_VERIFY_CERT
 configuration: python:mailman.config.exim4
+message_instance: yes
 
 EOF
 
