@@ -195,6 +195,7 @@ verp_personalized_deliveries: ${VERP_DELIVERIES:-no}
 verp_delivery_interval: ${VERP_INTERVAL:-0}
 max_recipients: ${MAX_RECIPIENTS:-150}
 max_delivery_threads: 10
+message_instance: yes
 
 
 
