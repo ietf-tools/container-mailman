@@ -2,7 +2,7 @@ FROM alpine:3.24
 
 USER root
 
-ENV MAILMAN_VERSION git+https://github.com/brong/mailman.git@c9302c4114f44fc1e2c38e86b311ee945554d065
+ENV MAILMAN_VERSION git+https://github.com/denefoster/mailman.git@8fe281a244a003354a7fd5186df81b3a3be8afc6
 ENV MAILARCHIVE_VERSION git+https://github.com/ietf-tools/mailman-mailarchive.git@main
 ENV IETF_STYLES_VERSION git+https://github.com/ietf-tools/mailman-ietf-styles.git@main
 
