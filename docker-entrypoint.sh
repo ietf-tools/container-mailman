@@ -352,6 +352,30 @@ echo "GLOBAL_ALLOWLIST_FQDN not defined, skipping IETF styles plugin..."
 
 fi
 
+if [[ -v UNWRAP_DOMAINS ]]; then
+
+echo "UNWRAP_DOMAINS found, setting up IETF unwrap plugin..."
+
+cat > /etc/mailman-ietf-unwrap.cfg <<EOF
+[general]
+wrap_domains: $UNWRAP_DOMAINS
+EOF
+
+cat >> /etc/mailman.cfg << EOF
+[plugin.ietf_unwrap]
+class: mailman_ietf_unwrap.plugin.IETFUnwrapPlugin
+enabled: yes
+component_package: mailman_ietf_unwrap
+configuration: /etc/mailman-ietf-unwrap.cfg
+
+EOF
+
+else
+
+echo "UNWRAP_DOMAINS not defined, skipping IETF unwrap plugin..."
+
+fi
+
 # setup runner numbers
 
 cat >> /etc/mailman.cfg << EOF
