@@ -68,6 +68,9 @@ mailman:
     digest:
       count: 1
   globalAllowlistFqdn: ""
+  # wrap domains (e.g. dmarc.ietf.org) whose addresses the unwrap plugin
+  # unwraps in To and Cc; empty leaves the plugin off
+  unwrapDomains: ""
   arc:
     enabled: false
     domain: mydomain.com

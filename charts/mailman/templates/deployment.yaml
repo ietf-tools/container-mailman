@@ -113,6 +113,10 @@ spec:
             - name: GLOBAL_ALLOWLIST_FQDN
               value: "{{ .Values.mailman.globalAllowlistFqdn }}"
             {{- end }}
+            {{- if .Values.mailman.unwrapDomains }}
+            - name: UNWRAP_DOMAINS
+              value: "{{ .Values.mailman.unwrapDomains }}"
+            {{- end }}
             - name: MAILMAN_REST_USER
               valueFrom:
                 secretKeyRef:
@@ -259,6 +263,10 @@ spec:
           {{- if .Values.mailman.globalAllowlistFqdn }}
           - name: GLOBAL_ALLOWLIST_FQDN
             value: "{{ .Values.mailman.globalAllowlistFqdn }}"
+          {{- end }}
+          {{- if .Values.mailman.unwrapDomains }}
+          - name: UNWRAP_DOMAINS
+            value: "{{ .Values.mailman.unwrapDomains }}"
           {{- end }}
           - name: MAILMAN_REST_USER
             valueFrom:

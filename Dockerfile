@@ -5,6 +5,7 @@ USER root
 ENV MAILMAN_VERSION git+https://github.com/denefoster/mailman.git@ef43013562cbc04b2f9bc92a5c87eda252579899
 ENV MAILARCHIVE_VERSION git+https://github.com/ietf-tools/mailman-mailarchive.git@main
 ENV IETF_STYLES_VERSION git+https://github.com/ietf-tools/mailman-ietf-styles.git@main
+ENV IETF_UNWRAP_VERSION git+https://github.com/ietf-tools/mailman-ietf-unwrap.git@main
 
 RUN apk update \
     && apk add --virtual build-deps gcc python3-dev musl-dev linux-headers \
@@ -18,6 +19,7 @@ RUN apk update \
                    ${MAILMAN_VERSION} \
                    ${MAILARCHIVE_VERSION} \
                    ${IETF_STYLES_VERSION} \
+                   ${IETF_UNWRAP_VERSION} \
                    'importlib-resources<6.0.0' \
     && apk del build-deps \
     && adduser -S mailman \
